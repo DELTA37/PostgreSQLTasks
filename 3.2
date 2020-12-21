@@ -1,0 +1,47 @@
+При работе с числами типов real и double precision нужно помнить, что сравнение двух чисел с плавающей точкой на предмет равенства их значений может привести к неожиданным результатам.
+Самостоятельно проведите аналогичные эксперименты с очень большими числами, находящимися на границе допустимого диапазона для чисел типов real и double precision.
+
+SELECT '5e-324'::double precision > '4e-324'::double precision;
+ ?column? 
+----------
+ f
+(1 row)
+
+SELECT '5e-324'::double precision;
+ float8 
+--------
+ 5e-324
+(1 row)
+
+SELECT '4e-324'::double precision;
+ float8 
+--------
+ 5e-324
+(1 row)
+
+
+SELECT '1e308'::double precision;
+ float8 
+--------
+ 1e+308
+(1 row)
+
+postgres=# SELECT '9e307'::double precision;
+ float8 
+--------
+ 9e+307
+(1 row)
+
+postgres=# SELECT '8e307'::double precision;
+ float8 
+--------
+ 8e+307
+(1 row)
+
+postgres=# SELECT '1e308'::double precision > '9e307'::double precision;
+ ?column? 
+----------
+ t
+(1 row)
+
+postgres=# 
