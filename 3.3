@@ -1,0 +1,149 @@
+# 3.3
+Тип serial может применяться для столбцов, содержащих числовые значения, которые должны быть уникальными в пределах таблицы, 
+например, идентификаторы каких-то объектов. В качестве иллюстрации применения типа serial предложим таблицу, содержащую наименования улиц и площадей:
+CREATE TABLE test_serial ( id serial,
+name text );
+Введите несколько строк. Обратите внимание, что значение для столбца id указывать не обязательно (и даже не нужно). 
+Но поскольку мы задаем значения не для всех столбцов, имеющихся в таблице, мы должны указать в команде INSERT не только список значений, но и список столбцов. 
+Конечно, в данном простом случае эти списки состоят лишь из одного элемента.
+INSERT INTO test_serial ( name ) VALUES ( 'Вишневая' ); INSERT INTO test_serial ( name ) VALUES ( 'Грушевая' ); INSERT INTO test_serial ( name ) VALUES ( 'Зеленая' );
+Сделайте выборку данных из таблицы, вы увидите, что значения столбца id имеют последовательные значения, начиная с 1.
+Давайте проведем эксперимент со столбцом id. Выполните команду INSERT, в которой укажите явное значение столбца id:
+INSERT INTO test_serial ( id, name ) VALUES ( 10, 'Прохладная' );
+А теперь добавьте еще одну строку, но уже не указывая явно значение для столб- ца id (как мы поступали в предыдущих командах):
+INSERT INTO test_serial ( name ) VALUES ( 'Луговая' );
+Вы увидите, что явное задание значения для столбца id не влияет на автоматическое генерирование значений этого столбца.
+
+demo=# INSERT INTO test_serial ( name ) VALUES ( 'Вишневая' ); INSERT INTO test_serial ( name ) VALUES ( 'Грушевая' ); INSERT INTO test_serial ( name ) VALUES ( 'Зеленая' );
+INSERT 0 1
+INSERT 0 1
+INSERT 0 1
+demo=# SELECT * from test_serial;
+ id |   name   
+----+----------
+  1 | Вишневая
+  2 | Грушевая
+  3 | Зеленая
+(3 rows)
+
+demo=# INSERT INTO test_serial ( id, name ) VALUES ( 10, 'Прохладная' );
+INSERT 0 1
+demo=# SELECT * from test_serial;
+ id |    name    
+----+------------
+  1 | Вишневая
+  2 | Грушевая
+  3 | Зеленая
+ 10 | Прохладная
+(4 rows)
+
+demo=# INSERT INTO test_serial ( name ) VALUES ( 'Луговая' );
+INSERT 0 1
+demo=# SELECT * from test_serial;
+ id |    name    
+----+------------
+  1 | Вишневая
+  2 | Грушевая
+  3 | Зеленая
+ 10 | Прохладная
+  4 | Луговая
+(5 rows)
+
+
+Немного усложним определение таблицы из предыдущего задания. Пусть теперь столбец id будет первичным ключом этой таблицы.
+CREATE TABLE test_serial ( id serial PRIMARY KEY,
+name text );
+Теперь выполните следующие команды для добавления строк в таблицу и удаления одной строки из нее. Для пошагового управления этим процессом выпол- няйте выборку данных из таблицы с помощью команды SELECT после каждой команды вставки или удаления.
+INSERT INTO test_serial ( name ) VALUES ( 'Вишневая' );
+Явно зададим значение столбца id:
+INSERT INTO test_serial ( id, name ) VALUES ( 2, 'Прохладная' ); 
+При выполнении этой команды СУБД выдаст сообщение об ошибке. Почему? 
+INSERT INTO test_serial ( name ) VALUES ( 'Грушевая' );
+Повторим эту же команду. Теперь все в порядке. Почему?
+INSERT INTO test_serial ( name ) VALUES ( 'Грушевая' );
+
+Добавим еще одну строку.
+INSERT INTO test_serial ( name ) VALUES ( 'Зеленая' );
+А теперь удалим ее же.
+DELETE FROM test_serial WHERE id = 4;
+Добавим последнюю строку.
+INSERT INTO test_serial ( name ) VALUES ( 'Луговая' );
+Теперь сделаем выборку.
+SELECT * FROM test_serial;
+Вы увидите, что в нумерации образовалась «дыра». Это из-за того, что при фор- мировании нового значения из последовательности поиск максимального зна- чения, уже имеющегося в столбце, не выполняется.
+id | name ----+------------
+      1  | Вишневая
+      2  | Прохладная
+      3  | Грушевая
+      5  | Луговая
+(4 строки)
+
+demo=# CREATE TABLE test_serial ( id serial PRIMARY KEY,
+name text );
+CREATE TABLE
+demo=# INSERT INTO test_serial ( name ) VALUES ( 'Вишневая' );
+INSERT 0 1
+demo=# SELECT * from test_serial;
+ id |   name   
+----+----------
+  1 | Вишневая
+(1 row)
+
+INSERT INTO test_serial ( id, name ) VALUES ( 2, 'Прохладная' ); 
+INSERT 0 1
+
+demo=# SELECT * from test_serial;
+ id |    name    
+----+------------
+  1 | Вишневая
+  2 | Прохладная
+(2 rows)
+
+
+INSERT INTO test_serial ( name ) VALUES ( 'Грушевая' );
+
+ERROR:  duplicate key value violates unique constraint "test_serial_pkey"
+DETAIL:  Key (id)=(2) already exists.
+
+Потому что id текущего поля при вставке определится как 2, но id=2 уже выставлен
+
+INSERT INTO test_serial ( name ) VALUES ( 'Грушевая' );
+INSERT 0 1
+
+demo=# SELECT * from test_serial;
+ id |    name    
+----+------------
+  1 | Вишневая
+  2 | Прохладная
+  3 | Грушевая
+(3 rows)
+
+Теперь все ок, так как элемент вставляется с id=3
+
+demo=# INSERT INTO test_serial ( name ) VALUES ( 'Зеленая' );
+INSERT 0 1
+demo=# SELECT * from test_serial;
+ id |    name    
+----+------------
+  1 | Вишневая
+  2 | Прохладная
+  3 | Грушевая
+  4 | Зеленая
+(4 rows)
+
+demo=# DELETE FROM test_serial WHERE id = 4;
+DELETE 1
+
+demo=# INSERT INTO test_serial ( name ) VALUES ( 'Луговая' );
+INSERT 0 1
+demo=# SELECT * from test_serial;
+ id |    name    
+----+------------
+  1 | Вишневая
+  2 | Прохладная
+  3 | Грушевая
+  5 | Луговая
+(4 rows)
+
+
+Вы увидите, что в нумерации образовалась «дыра». Это из-за того, что при фор- мировании нового значения из последовательности поиск максимального зна- чения, уже имеющегося в столбце, не выполняется.
