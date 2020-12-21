@@ -20,3 +20,29 @@ Check constraints:
 Referenced by:
     TABLE "bookings.flights" CONSTRAINT "flights_aircraft_code_fkey" FOREIGN KEY (aircraft_code) REFERENCES bookings.aircrafts(aircraft_code)
     TABLE "bookings.seats" CONSTRAINT "seats_aircraft_code_fkey" FOREIGN KEY (aircraft_code) REFERENCES bookings.aircrafts(aircraft_code) ON DELETE CASCADE
+
+# 2.4
+Если в предложении WHERE команды DELETE вы укажете логически и синтаксически корректное условие, но строк, удовлетворяющих этому условию, в таблице не окажется, то в ответ СУБД выведет сообщение
+DELETE 0
+Такая ситуация не является ошибкой или сбоем в работе СУБД. Например, если после удаления какой-то строки вы повторно попытаетесь удалить ее же, то получите именно такое сообщение.
+Самостоятельно смоделируйте описанную ситуацию, подобрав условие, которому гарантированно не соответствует ни одна строка в таблице «Самолеты» (aircrafts).
+
+SELECT * FROM bookings.aircrafts ;
+ aircraft_code |        model        | range 
+---------------+---------------------+-------
+ 773           | Boeing 777-300      | 11100
+ 763           | Boeing 767-300      |  7900
+ SU9           | Sukhoi SuperJet-100 |  3000
+ 320           | Airbus A320-200     |  5700
+ 321           | Airbus A321-200     |  5600
+ 319           | Airbus A319-100     |  6700
+ 733           | Boeing 737-300      |  4200
+ CN1           | Cessna 208 Caravan  |  1200
+ CR2           | Bombardier CRJ-200  |  2700
+(9 rows)
+
+Удалим самолеты, где range > 100000
+
+demo=# DELETE FROM bookings.aircrafts WHERE range > 100000;
+DELETE 0
+demo=# 
