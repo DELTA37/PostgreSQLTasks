@@ -1,0 +1,65 @@
+2) 
+demo=# SELECT passenger_name
+FROM tickets
+WHERE passenger_name LIKE '___ _____';
+ passenger_name 
+----------------
+ YAN ISAEV
+ YAN POPOV
+ RIM POPOV
+ LEV GUSEV
+ LEV FOMIN
+ LEV ISAEV
+ LEV ISAEV
+ LEV ORLOV
+ LEV POPOV
+ LEV POPOV
+ LEV BELOV
+ LEV GUSEV
+ LEV POPOV
+ LEV POPOV
+ LEV ORLOV
+ LEV FOMIN
+ YAN GUSEV
+ LEV POPOV
+ RIM ISAEV
+ RIM POPOV
+ LEV GUSEV
+(21 rows)
+
+7)
+demo=# SELECT DISTINCT departure_city, arrival_city
+FROM routes r
+JOIN aircrafts a ON r.aircraft_code = a.aircraft_code WHERE a.model = 'Боинг 777-300'
+ORDER BY 1;
+ departure_city | arrival_city 
+----------------+--------------
+ Екатеринбург   | Москва
+ Москва         | Екатеринбург
+ Москва         | Новосибирск
+ Москва         | Пермь
+ Москва         | Сочи
+ Новосибирск    | Москва
+ Пермь          | Москва
+ Сочи           | Москва
+(8 rows)
+
+demo=# SELECT DISTINCT departure_city, arrival_city
+FROM routes r
+JOIN aircrafts a ON r.aircraft_code = a.aircraft_code WHERE a.model = 'Боинг 777-300' AND departure_city < arrival_city
+ORDER BY 1;
+ departure_city | arrival_city 
+----------------+--------------
+ Екатеринбург   | Москва
+ Москва         | Новосибирск
+ Москва         | Пермь
+ Москва         | Сочи
+(4 rows)
+9)
+demo=# SELECT departure_city, arrival_city, COUNT((departure_city, arrival_city)) FROM routes WHERE departure_city = 'Москва' AND arrival_city = 'Санкт-Петербург' GROUP BY departure_city, arrival_city;
+ departure_city |  arrival_city   | count 
+----------------+-----------------+-------
+ Москва         | Санкт-Петербург |    12
+(1 row)
+
+demo=# 
