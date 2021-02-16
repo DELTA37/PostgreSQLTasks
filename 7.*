@@ -5,3 +5,85 @@
 Мы решили добавить в таблицу еще одну строку с такими же значениями ключевых атри- бутов, т. е. column1 — ABC, а column2 — NULL.
 Как вы думаете, будет ли операция вставки новой строки успешной или завер- шится с ошибкой? Объясните ваше решение.
 
+3)
+demo=# SELECT count( * )
+FROM tickets
+WHERE passenger_name = 'IVAN IVANOV';
+ count 
+-------
+   200
+(1 row)
+
+Time: 133.185 ms
+demo=# SELECT count( * )
+FROM ticket_flights
+WHERE fare_conditions = 'Comfort';
+ count 
+-------
+ 17291
+(1 row)
+
+Time: 43.489 ms
+demo=# SELECT count( * )
+FROM ticket_flights
+WHERE fare_conditions = 'Business';
+ count  
+--------
+ 107642
+(1 row)
+
+Time: 43.774 ms
+demo=# SELECT count( * )
+FROM ticket_flights
+WHERE fare_conditions = 'Economy';
+ count  
+--------
+ 920793
+(1 row)
+
+Time: 48.926 ms
+demo=# 
+
+
+После индекса:
+CREATE INDEX
+ON ticket_flights ( fare_conditions );
+CREATE INDEX
+Time: 567.389 ms
+demo=# 
+
+
+demo=# SELECT count( * )
+FROM ticket_flights
+WHERE fare_conditions = 'Comfort';
+ count 
+-------
+ 17291
+(1 row)
+
+Time: 2.516 ms
+demo=# 
+
+
+demo=# SELECT count( * )
+FROM ticket_flights
+WHERE fare_conditions = 'Business';
+ count  
+--------
+ 107642
+(1 row)
+
+Time: 7.200 ms
+
+
+demo=# SELECT count( * )
+FROM ticket_flights
+WHERE fare_conditions = 'Economy';
+ count  
+--------
+ 920793
+(1 row)
+
+Time: 31.320 ms
+demo=# 
+
