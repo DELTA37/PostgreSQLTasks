@@ -1,0 +1,32 @@
+1) demo=# \d+ aircrafts_log
+                                                Table "pg_temp_4.aircrafts_log"
+    Column     |            Type             | Collation | Nullable |      Default      | Storage  | Stats target | Description 
+---------------+-----------------------------+-----------+----------+-------------------+----------+--------------+-------------
+ aircraft_code | character(3)                |           |          |                   | extended |              | 
+ model         | text                        |           |          |                   | extended |              | 
+ range         | integer                     |           |          |                   | plain    |              | 
+ when_add      | timestamp without time zone |           |          | CURRENT_TIMESTAMP | plain    |              | 
+ operation     | text                        |           |          |                   | extended |              | 
+Access method: heap
+
+demo=# WITH add_row AS                                                       
+( INSERT INTO aircrafts_tmp
+VALUES ( 'SU9', 'Sukhoi SuperJet-100', 3000 ) ON CONFLICT DO NOTHING
+RETURNING *
+)
+INSERT INTO aircrafts_log
+SELECT add_row.aircraft_code, add_row.model, add_row.range            
+FROM add_row;
+INSERT 0 1
+demo=# 
+
+2) demo=# WITH add_row AS
+( INSERT INTO aircrafts_tmp
+SELECT * FROM aircrafts
+RETURNING aircraft_code, model, range,
+current_timestamp, 'INSERT'
+)
+INSERT INTO aircrafts_log
+SELECT * FROM add_row;
+INSERT 0 9
+demo=# 
